@@ -1,0 +1,22 @@
+<?php
+$_LANGUAGE = [
+	'analytics' => 'Analytics',
+	'search_sessions' => 'Search Sessions',
+	'search_sessions_results' => 'Sessions',
+	'edit' => 'Edit',
+	'view' => 'View',
+	'created' => 'Created',
+	'last_hit' => 'Last Hit',
+	'ip_address' => 'IP Address',
+	'referer' => 'Referer',
+	'campaign' => 'Campaign',
+	'hit_count' => 'Hit Count',
+	'unknown' => 'Unknown',
+	'session' => 'Session',
+	'time' => 'Date/Time',
+	'url' => 'URL',
+	'customer' => 'Customer',
+	'administrator' => 'Administrator',
+	'response_code' => 'Response Code',
+	'response_time' => 'Response Time',
+];
