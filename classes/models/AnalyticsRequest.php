@@ -25,28 +25,9 @@ class AnalyticsRequest extends Model {
 			'null_allowed'   => FALSE,
 			'default_value'  => 'CURRENT_TIMESTAMP',
 		],
-		'analytics_request_controller' => [
-			'data_type'      => 'text',
-			'data_length'    => 128,
-			'null_allowed'   => FALSE,
-		],
-		'analytics_request_method' => [
-			'data_type'      => 'text',
-			'data_length'    => 128,
-			'null_allowed'   => FALSE,
-		],
-		'analytics_request_params' => [
-			'data_type'      => 'text',
-			'data_length'    => 1024,
-			'null_allowed'   => TRUE,
-		],
-		'customer_id' => [
+		'analytics_url_id' => [
 			'data_type'      => 'bigint',
-			'null_allowed'   => TRUE,
-		],
-		'administrator_id' => [
-			'data_type'      => 'bigint',
-			'null_allowed'   => TRUE,
+			'null_allowed'   => FALSE,
 		],
 		'analytics_referer_id' => [
 			'data_type'      => 'bigint',
@@ -67,22 +48,30 @@ class AnalyticsRequest extends Model {
 	];
 
 	protected $indexes = [
-		'analytics_session_id',
 		'analytics_request_created',
-		'lower(analytics_request_controller)',
-		'lower(analytics_request_method)',
-		'lower(analytics_request_params)',
+		'analytics_url_id',
+		'analytics_session_id',
 		'analytics_referer_id',
 		'analytics_campaign_id',
 	];
 
 	protected $foreign_keys = [
+		'analytics_url_id'      => ['analytics_url', 'analytics_url_id'],
 		'analytics_session_id'  => ['analytics_session', 'analytics_session_id'],
-		'customer_id'  => ['customer', 'customer_id'],
-		'administrator_id'  => ['administrator', 'administrator_id'],
-		'analytics_referer_id'    => ['analytics_referer', 'analytics_referer_id'],
-		'analytics_campaign_id'    => ['analytics_campaign', 'analytics_campaign_id'],
+		'analytics_referer_id'  => ['analytics_referer', 'analytics_referer_id'],
+		'analytics_campaign_id' => ['analytics_campaign', 'analytics_campaign_id'],
 	];
+
+	public function getUrl() {
+		if (isset($this->objects['url'])) {
+			return $this->objects['url'];
+		}
+
+		$this->objects['url'] = $this->getModel('\modules\analytics\classes\models\AnalyticsUrl')->get([
+			'id' => $this->analytics_url_id,
+		]);
+		return $this->objects['url'];
+	}
 
 	public function getReferer() {
 		if (isset($this->objects['referer'])) {
@@ -123,5 +112,16 @@ class AnalyticsRequest extends Model {
 			return $campaign->name;
 		}
 		return FALSE;
+	}
+
+	public function getEvents() {
+		if (isset($this->objects['events'])) {
+			return $this->objects['events'];
+		}
+
+		$this->objects['events'] = $this->getModel('\modules\analytics\classes\models\AnalyticsEvent')->getMulti([
+			'analytics_request_id' => $this->id,
+		]);
+		return $this->objects['events'];
 	}
 }

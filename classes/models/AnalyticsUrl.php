@@ -6,12 +6,12 @@ use core\classes\URL;
 use core\classes\Model;
 use core\classes\Request;
 
-class AnalyticsReferer extends Model {
+class AnalyticsUrl extends Model {
 
-	protected $table       = 'analytics_referer';
-	protected $primary_key = 'analytics_referer_id';
+	protected $table       = 'analytics_url';
+	protected $primary_key = 'analytics_url_id';
 	protected $columns     = [
-		'analytics_referer_id' => [
+		'analytics_url_id' => [
 			'data_type'      => 'bigint',
 			'auto_increment' => TRUE,
 			'null_allowed'   => FALSE,
@@ -20,47 +20,55 @@ class AnalyticsReferer extends Model {
 			'data_type'      => 'int',
 			'null_allowed'   => FALSE,
 		],
-		'analytics_referer_created' => [
+		'analytics_url_created' => [
 			'data_type'      => 'datetime',
 			'null_allowed'   => FALSE,
 			'default_value'  => 'CURRENT_TIMESTAMP',
 		],
-		'analytics_referer_last_hit' => [
+		'analytics_url_last_hit' => [
 			'data_type'      => 'datetime',
 			'null_allowed'   => FALSE,
 			'default_value'  => 'CURRENT_TIMESTAMP',
 		],
-		'analytics_referer_domain' => [
+		'analytics_url_controller' => [
 			'data_type'      => 'text',
-			'data_length'    => 256,
+			'data_length'    => 128,
 			'null_allowed'   => FALSE,
 		],
-		'analytics_referer_url' => [
+		'analytics_url_method' => [
+			'data_type'      => 'text',
+			'data_length'    => 128,
+			'null_allowed'   => FALSE,
+		],
+		'analytics_url_params' => [
 			'data_type'      => 'text',
 			'data_length'    => 1024,
-			'null_allowed'   => FALSE,
+			'null_allowed'   => TRUE,
 		],
 	];
 
 	protected $indexes = [
 		'site_id',
-		'lower(analytics_referer_domain)',
-		'analytics_referer_last_hit',
+		'analytics_url_created',
+		'analytics_url_last_hit',
+		'analytics_url_controller',
+		'analytics_url_method',
+		'analytics_url_params',
 	];
 
 	protected $foreign_keys = [];
 
 	public function getHitCount() {
 		return $this->getModel('\modules\analytics\classes\models\AnalyticsRequest')->getCount(
-			['analytics_referer_id' => $this->id ]
+			['analytics_url_id' => $this->id ]
 		);
 	}
 
 	public function updateLastHit() {
 		$sql = "
-			UPDATE analytics_referer
-			SET analytics_referer_last_hit = CURRENT_TIMESTAMP
-			WHERE analytics_referer_id = ".(int)$this->id;
+			UPDATE analytics_url
+			SET analytics_url_last_hit = CURRENT_TIMESTAMP
+			WHERE analytics_url_id = ".(int)$this->id;
 
 		return $this->database->executeQuery($sql);
 	}

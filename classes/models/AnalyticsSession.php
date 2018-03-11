@@ -68,4 +68,13 @@ class AnalyticsSession extends Model {
 			$ordering, $pagination, $grouping
 		);
 	}
+
+	public function updateLastHit() {
+		$sql = "
+			UPDATE analytics_session
+			SET analytics_session_last_hit = CURRENT_TIMESTAMP
+			WHERE analytics_session_id = ".(int)$this->id;
+
+		return $this->database->executeQuery($sql);
+	}
 }

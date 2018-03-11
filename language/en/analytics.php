@@ -29,4 +29,7 @@ $_LANGUAGE = [
 	'administrator' => 'Administrator',
 	'response_code' => 'Response Code',
 	'response_time' => 'Response Time',
+	'event' => 'Event',
+	'events' => 'Events',
+	'event_type' => 'Event Type',
 ];

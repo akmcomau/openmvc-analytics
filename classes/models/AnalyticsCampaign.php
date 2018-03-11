@@ -16,6 +16,10 @@ class AnalyticsCampaign extends Model {
 			'auto_increment' => TRUE,
 			'null_allowed'   => FALSE,
 		],
+		'site_id' => [
+			'data_type'      => 'int',
+			'null_allowed'   => FALSE,
+		],
 		'analytics_campaign_name' => [
 			'data_type'      => 'text',
 			'data_length'    => 256,
@@ -54,6 +58,7 @@ class AnalyticsCampaign extends Model {
 	];
 
 	protected $indexes = [
+		'site_id',
 		'analytics_campaign_created',
 		'analytics_campaign_last_hit',
 		'analytics_campaign_source',
@@ -73,5 +78,14 @@ class AnalyticsCampaign extends Model {
 		return $this->getModel('\modules\analytics\classes\models\AnalyticsRequest')->getCount(
 			['analytics_campaign_id' => $this->id ]
 		);
+	}
+
+	public function updateLastHit() {
+		$sql = "
+			UPDATE analytics_campaign
+			SET analytics_campaign_last_hit = CURRENT_TIMESTAMP
+			WHERE analytics_campaign_id = ".(int)$this->id;
+
+		return $this->database->executeQuery($sql);
 	}
 }
