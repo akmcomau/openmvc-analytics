@@ -38,52 +38,6 @@ class Hooks extends Hook {
 			$session->ip = $this->request->serverParam('REMOTE_ADDR');
 			$session->user_agent = $this->request->serverParam('HTTP_USER_AGENT');
 
-			// get the campaign
-			if ($this->request->getParam('utm_source')) {
-				// lookup campaign
-				$campaign = $analytics_campaign->get([
-					'source' => $this->request->getParam('utm_source'),
-					'medium' => $this->request->getParam('utm_medium'),
-					'campaign' => $this->request->getParam('utm_campaign'),
-					'term' => $this->request->getParam('utm_term'),
-				]);
-
-				// create the user agent
-				if (!$campaign) {
-					$campaign = $analytics_campaign->getModel('\modules\analytics\classes\models\AnalyticsCampaign');
-					$campaign->source = $this->request->getParam('utm_source') ? : '';
-					$campaign->medium = $this->request->getParam('utm_medium') ? : '';
-					$campaign->campaign = $this->request->getParam('utm_campaign') ? : '';
-					$campaign->term = $this->request->getParam('utm_term') ? : '';
-					$campaign->insert();
-				}
-
-				// set the campaign id
-				$session->analytics_campaign_id = $campaign->id;
-			}
-
-			// is there a referer
-			$http_referer = $this->request->serverParam('HTTP_REFERER');
-			if ($http_referer) {
-				$referer = $analytics_referer->get([
-					'url' => $http_referer,
-				]);
-				if (!$referer) {
-					// parse the url
-					$url = parse_url($http_referer);
-					if ($url) {
-						$referer = $analytics_referer->getModel('\modules\analytics\classes\models\AnalyticsReferer');
-						$referer->url = $http_referer;
-						$referer->domain = $url["host"];
-						$referer->insert();
-					}
-				}
-
-				if ($referer) {
-					$session->analytics_referer_id = $referer->id;
-				}
-			}
-
 			// create the session record
 			$session->insert();
 			$this->request->session->set(['analytics_session_id'], $session->id);
@@ -97,6 +51,54 @@ class Hooks extends Hook {
 		$customer = $this->request->getAuthentication()->customerLoggedIn();
 		$administrator = $this->request->getAuthentication()->administratorLoggedIn();
 		$request = $analytics_request->getModel('\modules\analytics\classes\models\AnalyticsRequest');
+
+		// get the campaign
+		if ($this->request->getParam('utm_source')) {
+			// lookup campaign
+			$campaign = $analytics_campaign->get([
+				'source' => $this->request->getParam('utm_source'),
+					'medium' => $this->request->getParam('utm_medium'),
+					'campaign' => $this->request->getParam('utm_campaign'),
+					'term' => $this->request->getParam('utm_term'),
+			]);
+
+			// create the user agent
+			if (!$campaign) {
+				$campaign = $analytics_campaign->getModel('\modules\analytics\classes\models\AnalyticsCampaign');
+				$campaign->source = $this->request->getParam('utm_source') ? : '';
+				$campaign->medium = $this->request->getParam('utm_medium') ? : '';
+				$campaign->campaign = $this->request->getParam('utm_campaign') ? : '';
+				$campaign->term = $this->request->getParam('utm_term') ? : '';
+				$campaign->insert();
+			}
+
+			// set the campaign id
+			$request->analytics_campaign_id = $campaign->id;
+		}
+
+		// is there a referer
+		$http_referer = $this->request->serverParam('HTTP_REFERER');
+		if ($http_referer) {
+			$referer = $analytics_referer->get([
+				'url' => $http_referer,
+			]);
+			if (!$referer) {
+				// parse the url
+				$url = parse_url($http_referer);
+				if ($url) {
+					$referer = $analytics_referer->getModel('\modules\analytics\classes\models\AnalyticsReferer');
+					$referer->url = $http_referer;
+					$referer->domain = $url["host"];
+					$referer->insert();
+				}
+			}
+
+			if ($referer) {
+				$request->analytics_referer_id = $referer->id;
+			}
+		}
+
+		// Fill the request record
 		$request->analytics_session_id = $session->id;
 		$request->controller = $this->request->getControllerName();
 		$request->method = $this->request->getMethodName();

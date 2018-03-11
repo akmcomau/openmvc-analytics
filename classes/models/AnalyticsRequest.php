@@ -48,6 +48,14 @@ class AnalyticsRequest extends Model {
 			'data_type'      => 'bigint',
 			'null_allowed'   => TRUE,
 		],
+		'analytics_referer_id' => [
+			'data_type'      => 'bigint',
+			'null_allowed'   => TRUE,
+		],
+		'analytics_campaign_id' => [
+			'data_type'      => 'bigint',
+			'null_allowed'   => TRUE,
+		],
 		'analytics_request_response_code' => [
 			'data_type'      => 'smallint',
 			'null_allowed'   => FALSE,
@@ -64,11 +72,56 @@ class AnalyticsRequest extends Model {
 		'lower(analytics_request_controller)',
 		'lower(analytics_request_method)',
 		'lower(analytics_request_params)',
+		'analytics_referer_id',
+		'analytics_campaign_id',
 	];
 
 	protected $foreign_keys = [
 		'analytics_session_id'  => ['analytics_session', 'analytics_session_id'],
 		'customer_id'  => ['customer', 'customer_id'],
 		'administrator_id'  => ['administrator', 'administrator_id'],
+		'analytics_referer_id'    => ['analytics_referer', 'analytics_referer_id'],
+		'analytics_campaign_id'    => ['analytics_campaign', 'analytics_campaign_id'],
 	];
+
+	public function getReferer() {
+		if (isset($this->objects['referer'])) {
+			return $this->objects['referer'];
+		}
+
+		$this->objects['referer'] = $this->getModel('\modules\analytics\classes\models\AnalyticsReferer')->get([
+			'id' => $this->analytics_referer_id,
+		]);
+		return $this->objects['referer'];
+	}
+
+	public function getRefererHost() {
+		$referer = $this->getReferer();
+		if ($referer) {
+			$url = parse_url($referer->url);
+			if ($url) {
+				return $url['host'];
+			}
+		}
+		return NULL;
+	}
+
+	public function getCampaign() {
+		if (isset($this->objects['campaign'])) {
+			return $this->objects['campaign'];
+		}
+
+		$this->objects['campaign'] = $this->getModel('\modules\analytics\classes\models\AnalyticsCampaign')->get([
+			'id' => $this->analytics_campaign_id,
+		]);
+		return $this->objects['campaign'];
+	}
+
+	public function getCampaignName() {
+		$campaign = $this->getCampaign();
+		if ($campaign) {
+			return $campaign->name;
+		}
+		return FALSE;
+	}
 }

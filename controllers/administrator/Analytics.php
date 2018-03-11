@@ -13,6 +13,14 @@ class Analytics extends Controller {
 
 	protected $permissions = [
 		'config' => ['administrator'],
+		'index' => ['administrator'],
+		'sessions' => ['administrator'],
+		'viewSession' => ['administrator'],
+		'campaigns' => ['administrator'],
+		'editCampaign' => ['administrator'],
+		'viewCampaign' => ['administrator'],
+		'referers' => ['administrator'],
+		'viewReferer' => ['administrator'],
 	];
 
 	public function config() {
@@ -62,5 +70,59 @@ class Analytics extends Controller {
 
 		$template = $this->getTemplate('pages/administrator/analytics/view_session.php', $data, 'modules/analytics');
 		$this->response->setContent($template->render());
+	}
+
+	public function campaigns() {
+		$this->language->loadLanguageFile('analytics.php', 'modules/analytics');
+
+		$model      = new Model($this->config, $this->database);
+		$campaign   = $model->getModel('\modules\analytics\classes\models\AnalyticsCampaign');
+		$pagination = new Pagination($this->request, 'created', 'desc');
+
+		$params = [
+		];
+		$campaigns = $campaign->getMulti($params, $pagination->getOrdering(), $pagination->getLimitOffset());
+		$pagination->setRecordCount($campaign->getCount($params));
+
+		$data = [
+			'campaigns' => $campaigns,
+			'pagination' => $pagination,
+		];
+
+		$template = $this->getTemplate('pages/administrator/analytics/campaigns.php', $data, 'modules/analytics');
+		$this->response->setContent($template->render());
+	}
+
+	public function editCampaigns() {
+
+	}
+
+	public function viewCampaigns() {
+
+	}
+
+	public function referers() {
+		$this->language->loadLanguageFile('analytics.php', 'modules/analytics');
+
+		$model      = new Model($this->config, $this->database);
+		$referer   = $model->getModel('\modules\analytics\classes\models\AnalyticsReferer');
+		$pagination = new Pagination($this->request, 'created', 'desc');
+
+		$params = [
+		];
+		$referers = $referer->getMulti($params, $pagination->getOrdering(), $pagination->getLimitOffset());
+		$pagination->setRecordCount($referer->getCount($params));
+
+		$data = [
+			'referers' => $referers,
+			'pagination' => $pagination,
+		];
+
+		$template = $this->getTemplate('pages/administrator/analytics/referers.php', $data, 'modules/analytics');
+		$this->response->setContent($template->render());
+	}
+
+	public function viewReferers() {
+
 	}
 }

@@ -74,9 +74,21 @@ class Installer {
 			'text_tag' => 'analytics',
 			'icon' => 'icon-eye',
 			'children' => [
+				'overview' => [
+					'controller' => 'administrator/Analytics',
+					'method' => 'index',
+				],
 				'sessions' => [
 					'controller' => 'administrator/Analytics',
 					'method' => 'sessions',
+				],
+				'campaigns' => [
+					'controller' => 'administrator/Analytics',
+					'method' => 'campaigns',
+				],
+				'referers' => [
+					'controller' => 'administrator/Analytics',
+					'method' => 'referers',
 				],
 			],
 		]

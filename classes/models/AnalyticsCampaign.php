@@ -21,6 +21,16 @@ class AnalyticsCampaign extends Model {
 			'data_length'    => 256,
 			'null_allowed'   => TRUE,
 		],
+		'analytics_campaign_created' => [
+			'data_type'      => 'datetime',
+			'null_allowed'   => FALSE,
+			'default_value'  => 'CURRENT_TIMESTAMP',
+		],
+		'analytics_campaign_last_hit' => [
+			'data_type'      => 'datetime',
+			'null_allowed'   => FALSE,
+			'default_value'  => 'CURRENT_TIMESTAMP',
+		],
 		'analytics_campaign_source' => [
 			'data_type'      => 'text',
 			'data_length'    => 64,
@@ -44,6 +54,8 @@ class AnalyticsCampaign extends Model {
 	];
 
 	protected $indexes = [
+		'analytics_campaign_created',
+		'analytics_campaign_last_hit',
 		'analytics_campaign_source',
 		'analytics_campaign_medium',
 		'analytics_campaign_campaign',
@@ -57,4 +69,9 @@ class AnalyticsCampaign extends Model {
 	protected $foreign_keys = [
 	];
 
+	public function getHitCount() {
+		return $this->getModel('\modules\analytics\classes\models\AnalyticsRequest')->getCount(
+			['analytics_campaign_id' => $this->id ]
+		);
+	}
 }
